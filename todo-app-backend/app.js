@@ -1,25 +1,18 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const taskRoutes = require('./routes/tasks');
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
-mongoose.connect('mongodb://localhost:27017/todoDB');
-
-// const express = require('express');
-// const cors = require('cors');
-// const app = express();
-
-// Enable CORS
-// app.use(cors());
-
-// Your existing backend routes and logic
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/api', taskRoutes);
 
-module.exports = app;
-// Compare this snippet from routes/tasks.js:
-// const express = require('express');
+app.use("/api", taskRoutes);
+
+
+app.listen(3000, () => {
+    console.log("Server is running on port no. 3000");
+})
+
+

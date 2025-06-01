@@ -1,24 +1,41 @@
-const Task = require('../models/Task');
+const connection = require("../db/dbconnection");
 
-exports.getAllTasks = async (req, res) => {
-  const tasks = await Task.find();
-  res.json(tasks);
+// getAll
+exports.getAllTasks = (req, res) => {
+  connection.query("SELECT * FROM tasks", (err, results) => {
+    if (!err) res.status(200).json(results);
+    else res.status(500).send("Error fetching tasks");
+  });
 };
 
-exports.createTask = async (req, res) => {
-  const task = new Task(req.body);
-  await task.save();
-  res.status(201).json(task);
+// post
+exports.createTask = (req, res) => {
+  const { title, status = 'pending' } = req.body;
+  connection.query("INSERT INTO tasks (title, status) VALUES (?, ?)",
+    [title, status],
+    (err, result) => {
+      if (!err) res.status(201).send("Task created");
+      else res.status(500).send("Error creating task");
+    }
+  );
 };
 
-exports.updateTask = async (req, res) => {
-  const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(task);
+// put
+exports.updateTask = (req, res) => {
+  const { title, status } = req.body;
+  connection.query("UPDATE tasks SET title = ?, status = ? WHERE id = ?",
+    [title, status, req.params.id],
+    (err, result) => {
+      if (!err && result.affectedRows > 0) res.status(200).send("Task updated");
+      else res.status(404).send("Task not found");
+    }
+  );
 };
 
-exports.deleteTask = async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id);
-  res.json({ message: 'Task deleted' });
+// delete
+exports.deleteTask = (req, res) => {
+  connection.query("DELETE FROM tasks WHERE id = ?", [req.params.id], (err, result) => {
+    if (!err && result.affectedRows > 0) res.status(200).send("Task deleted");
+    else res.status(404).send("Task not found");
+  });
 };
-
-// const router = express.Router();
